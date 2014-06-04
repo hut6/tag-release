@@ -1,0 +1,91 @@
+#!/usr/bin/env php
+<?php
+
+if(`git status --porcelain`) {
+    die("Working directory must be clean. Run 'git status'\n\n");
+}
+
+/** Options */
+
+$releases = array('fix', 'minor', 'major');
+
+$type = 'fix';
+foreach($argv as $arg) {
+    if(in_array($arg, $releases)) {
+        $type = $arg;
+    }
+}
+
+$force = in_array('--force', $argv);
+$push = in_array('--push', $argv);
+
+/* Check current branch */
+$branch = trim(`git rev-parse --abbrev-ref HEAD`);
+
+if($branch !== 'master' && !$force) {
+    die("Can't release non-master branch '$branch'. Use '--force'.\n\n");
+}
+
+$versionFile = __DIR__ . '/../VERSION';
+
+$version = file_get_contents($versionFile);
+
+
+/**
+ * @return string
+*/
+function usage(){
+    return "Usage: app/$0 [fix|minor|major] [--force]\n\n--force Applies release to non-master branch\n\n";
+}
+
+
+if(!in_array($type, $releases)) {
+    die(usage());
+}
+
+$version = incrementVersion($version, $type);
+
+function run($cmd) {
+    echo "$cmd\n";
+    `$cmd`;
+}
+
+file_put_contents($versionFile, $version);
+run("git commit VERSION -m 'Release $version'");
+run("git tag -a $version -m 'Release $version'");
+
+
+echo "Version is $version\n";
+
+if($push) {
+    run('git push origin');
+    run('git push origin --tags');
+}
+
+function incrementVersion($version, $type) {
+    $bits = explode('.', $version);
+    if(empty($bits[0])) {
+        $bits[0] = 1;
+    }
+    if(empty($bits[1])) {
+        $bits[1] = 0;
+    }
+    if(empty($bits[2])) {
+        $bits[2] = 0;
+    }
+
+    if($type == 'fix') {
+        $bits[2] += 1;
+    }
+    elseif($type == 'minor') {
+        $bits[1] += 1;
+        $bits[2] = 0;
+    }
+    elseif($type == 'major') {
+        $bits[0] += 1;
+        $bits[1] = 0;
+        $bits[2] = 0;
+    }
+
+    return implode('.', $bits);
+}
