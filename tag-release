@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+if(in_array('--self-update', $argv)) {
+  run('curl -s -H "Cache-Control: no-cache" https://raw.githubusercontent.com/hut6/tag-release/master/tag-release > ' . escapeshellarg($_SERVER['SCRIPT_FILENAME']));
+  die("Complete\n\n");
+}
+
 if(`git status --porcelain`) {
     die("Working directory must be clean. Run 'git status'\n\n");
 }
