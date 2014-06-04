@@ -3,7 +3,7 @@
 
 if(in_array('--self-update', $argv)) {
   run('curl -s -H "Cache-Control: nocache" https://raw.githubusercontent.com/hut6/tag-release/master/tag-release > ' . escapeshellarg($_SERVER['SCRIPT_FILENAME']));
-  die('Complete');
+  die("Complete\n\n");
 }
 
 if(`git status --porcelain`) {
