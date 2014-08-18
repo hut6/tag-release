@@ -6,19 +6,23 @@ if(in_array('--self-update', $argv)) {
   die("Complete\n\n");
 }
 
-if(`git status --porcelain`) {
-    die("Working directory must be clean. Run 'git status'\n\n");
-}
-
 /** Options */
 
 $releases = array('fix', 'minor', 'major');
 
-$type = 'fix';
+$type = '';
 foreach($argv as $arg) {
     if(in_array($arg, $releases)) {
         $type = $arg;
     }
+}
+
+if(!$type) {
+    die(usage());
+}
+
+if(`git status --porcelain`) {
+    die("Working directory must be clean. Run 'git status'\n\n");
 }
 
 $force = in_array('--force', $argv);
@@ -40,12 +44,9 @@ $version = file_get_contents($versionFile);
  * @return string
 */
 function usage(){
-    return "Usage: app/$0 [fix|minor|major] [--force]\n\n--force Applies release to non-master branch\n\n";
-}
-
-
-if(!in_array($type, $releases)) {
-    die(usage());
+    return "Usage: app/tag-release [fix|minor|major] [--push] [--force]\n"
+    . "  --push    Also pushes branch and tags to origin\n"
+    . "  --force   Applies release to non-master branch\n";
 }
 
 $version = incrementVersion($version, $type);
