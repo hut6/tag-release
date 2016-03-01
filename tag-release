@@ -12,7 +12,7 @@ if(!in_array('--force-css', $argv)) {
     if(strstr($changes, '.scss') && ! strstr($changes, 'style.css')) { // Check if sass has changed but CSS hasn't
         die("SASS has changed, but not style.css. Did you forget to 'npm run css'? Use --force-css to ignore");
     }
-    $cssLineCount = trim(`wc -l css/style.css | awk '{ print $1 }'`);
+    $cssLineCount = trim(`[ -e css/style.css ] && wc -l css/style.css | awk '{ print $1 }'`);
     if($cssLineCount > 100) {
         die("css/style.css has $cssLineCount lines. Did you forget to 'npm run css'? Use --force-css to ignore");
     }
