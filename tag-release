@@ -51,7 +51,7 @@ $version = file_get_contents($versionFile);
  * @return string
  */
 function usage(){
-    return "Usage: app/tag-release [patch|minor|major] [--push] [--force]\n"
+    return "Usage: bin/tag-release [patch|minor|major] [--push] [--force]\n"
     . "  --push    Also pushes branch and tags to origin\n"
     . "  --force   Applies release to non-master branch\n";
 }
