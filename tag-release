@@ -2,20 +2,27 @@
 <?php
 
 if(in_array('--self-update', $argv)) {
-  run('curl -s -H "Cache-Control: no-cache" https://raw.githubusercontent.com/hut6/tag-release/master/tag-release > ' . escapeshellarg($_SERVER['SCRIPT_FILENAME']));
-  die("Complete\n\n");
+    run('curl -s -H "Cache-Control: no-cache" https://raw.githubusercontent.com/hut6/tag-release/master/tag-release > ' . escapeshellarg($_SERVER['SCRIPT_FILENAME']));
+    die("Complete\n\n");
+}
+
+/* Check if style.css is minified */
+if(!in_array('--force-css', $argv)) {
+    $changes = `git status -s | grep 'css'`; // Look for style changes
+    if(strstr($changes, '.scss') && ! strstr($changes, 'style.css')) { // Check if sass has changed but CSS hasn't
+        die("SASS has changed, but not style.css. Did you forget to 'npm run css'? Use --force-css to ignore");
+    }
+    $cssLineCount = trim(`wc -l css/style.css | awk '{ print $1 }'`);
+    if($cssLineCount > 100) {
+        die("css/style.css has $cssLineCount lines. Did you forget to 'npm run css'? Use --force-css to ignore");
+    }
 }
 
 /** Options */
 
-$releases = array('fix', 'minor', 'major');
+$releases = array('fix', 'patch', 'minor', 'major');
 
-$type = '';
-foreach($argv as $arg) {
-    if(in_array($arg, $releases)) {
-        $type = $arg;
-    }
-}
+$type = current(array_intersect($argv, $releases));
 
 if(!$type) {
     die(usage());
@@ -42,9 +49,9 @@ $version = file_get_contents($versionFile);
 
 /**
  * @return string
-*/
+ */
 function usage(){
-    return "Usage: app/tag-release [fix|minor|major] [--push] [--force]\n"
+    return "Usage: app/tag-release [patch|minor|major] [--push] [--force]\n"
     . "  --push    Also pushes branch and tags to origin\n"
     . "  --force   Applies release to non-master branch\n";
 }
@@ -57,14 +64,16 @@ function run($cmd) {
 }
 
 file_put_contents($versionFile, $version);
-run("git commit VERSION -m 'Release $version'");
+$message = escapeshellarg("Release $version: " . trim(`git log -1 --pretty=%B`));
+
+run("git commit VERSION -m $message");
 run("git tag -a $version -m 'Release $version'");
 
 
 echo "Version is $version\n";
 
 if($push) {
-    run('git push origin');
+    run('git push origin master');
     run('git push origin --tags');
 }
 
@@ -80,7 +89,7 @@ function incrementVersion($version, $type) {
         $bits[2] = 0;
     }
 
-    if($type == 'fix') {
+    if($type == 'fix' || $type == 'patch') {
         $bits[2] += 1;
     }
     elseif($type == 'minor') {
