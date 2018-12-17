@@ -1,14 +1,18 @@
 {
-    "name": "hut6/tag-release",
-    "description": "Release tagging...",
-    "type": "library",
-    "license": "proprietary",
-    "authors": [
-        {
-            "name": "Ryan Castle",
-            "email": "ryan@hutsix.com.au"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {}
+  "name": "hut6/tag-release",
+  "description": "Release tagging...",
+  "type": "library",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Ryan Castle",
+      "email": "ryan@hutsix.com.au"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+  },
+  "bin": [
+    "bin/php-cs-fixer"
+  ]
 }

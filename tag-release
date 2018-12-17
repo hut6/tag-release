@@ -19,7 +19,6 @@ if(!in_array('--force-css', $argv)) {
 }
 
 /** Options */
-
 $releases = array('fix', 'patch', 'minor', 'major');
 
 $type = current(array_intersect($argv, $releases));
@@ -34,6 +33,7 @@ if(`git status --porcelain`) {
 
 $force = in_array('--force', $argv);
 $push = in_array('--push', $argv);
+$rebase = in_array('--rebase', $argv);
 
 /* Check current branch */
 $branch = trim(`git rev-parse --abbrev-ref HEAD`);
@@ -41,6 +41,22 @@ $branch = trim(`git rev-parse --abbrev-ref HEAD`);
 if($branch !== 'master' && !$force) {
     die("Can't release non-master branch '$branch'. Use '--force'.\n\n");
 }
+
+// Make sure we are on head of origin
+$output = null; $return = null;
+if($rebase) {
+    exec('git pull --rebase', $output, $return);
+} else {
+    exec('git pull --ff-only', $output, $return);
+}
+if(!$force && $return !== 0) {
+    die("Failed merging origin. Use '--force' if you like chaos.");
+}
+
+//if(!in_array('--skip-style', $argv, true)) {
+//    exec('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
+//    exec('[[ $(git status src --porcelain) ]] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
+//}
 
 $versionFile = __DIR__ . '/../VERSION';
 
@@ -52,8 +68,8 @@ $version = file_get_contents($versionFile);
  */
 function usage(){
     return "Usage: bin/tag-release [patch|minor|major] [--push] [--force]\n"
-    . "  --push    Also pushes branch and tags to origin\n"
-    . "  --force   Applies release to non-master branch\n";
+        . "  --push    Also pushes branch and tags to origin\n"
+        . "  --force   Applies release to non-master branch\n";
 }
 
 $version = incrementVersion($version, $type);
@@ -64,7 +80,7 @@ function run($cmd) {
 }
 
 file_put_contents($versionFile, $version);
-$message = escapeshellarg("Release $version: " . trim(`git log -1 --pretty=%B`));
+$message = escapeshellarg("$version: " . trim(`git log -1 --pretty=%B`));
 
 run("git commit VERSION -m $message");
 run("git tag -a $version -m 'Release $version'");
@@ -73,8 +89,7 @@ run("git tag -a $version -m 'Release $version'");
 echo "Version is $version\n";
 
 if($push) {
-    run('git push origin master');
-    run('git push origin --tags');
+    run('git push origin master --follow-tags');
 }
 
 function incrementVersion($version, $type) {
