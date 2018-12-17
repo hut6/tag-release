@@ -53,10 +53,10 @@ if(!$force && $return !== 0) {
     die("Failed merging origin. Use '--force' if you like chaos.");
 }
 
-//if(!in_array('--skip-style', $argv, true)) {
-//    exec('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
-//    exec('[[ $(git status src --porcelain) ]] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
-//}
+if(!in_array('--skip-style', $argv, true)) {
+    exec('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
+    exec('[[ $(git status src --porcelain) ]] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
+}
 
 $versionFile = __DIR__ . '/../VERSION';
 

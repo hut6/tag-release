@@ -3,6 +3,7 @@
   "description": "Release tagging...",
   "type": "library",
   "license": "proprietary",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "Ryan Castle",
