@@ -3,8 +3,7 @@ tag-release
 
 Script to tag releases
 
-### Quick Way
+### Quick way and best
 
-    curl https://raw.githubusercontent.com/hut6/tag-release/master/tag-release > app/tag-release
-    chmod +x app/tag-release
-    app/tag-release
+    composer req --dev hut6/tag-release
+    bin/tag-release patch --push
