@@ -1,11 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-if(in_array('--self-update', $argv)) {
-    run('curl -s -H "Cache-Control: no-cache" https://raw.githubusercontent.com/hut6/tag-release/master/tag-release > ' . escapeshellarg($_SERVER['SCRIPT_FILENAME']));
-    die("Complete\n\n");
-}
-
 /* Check if style.css is minified */
 if(!in_array('--force-css', $argv)) {
     $changes = `git status -s | grep 'css'`; // Look for style changes
@@ -57,9 +52,7 @@ if(!in_array('--skip-style', $argv, true)) {
     exec('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
     exec('[[ $(git status src --porcelain) ]] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
 }
-
-$versionFile = __DIR__ . '/../VERSION';
-
+$versionFile = dirname(__DIR__, 3) . '/VERSION';
 $version = file_get_contents($versionFile);
 
 
