@@ -65,6 +65,7 @@ function usage(){
         . "  --force   Applies release to non-master branch\n";
 }
 
+$oldVersion = $version;
 $version = incrementVersion($version, $type);
 
 function run($cmd) {
@@ -73,7 +74,7 @@ function run($cmd) {
 }
 
 file_put_contents($versionFile, $version);
-$message = escapeshellarg("$version: " . trim(`git log -1 --pretty=%B`));
+$message = escapeshellarg("$version: " . str_replace("$oldVersion: ", '', trim(`git log -1 --pretty=%B`)));
 
 run("git commit VERSION -m $message");
 run("git tag -a $version -m 'Release $version'");
