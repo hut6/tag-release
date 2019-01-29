@@ -82,6 +82,9 @@ run("git tag -a $version -m 'Release $version'");
 
 echo "Version is $version\n";
 
+/* Run post-tag-cmd scripts if present */
+run('composer run-script -l 2>&1 | grep post-tag-cmd > /dev/null && composer post-tag-cmd');
+
 if($push) {
     run('git push origin master --follow-tags');
 }
