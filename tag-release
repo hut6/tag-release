@@ -48,27 +48,12 @@ if(!$force && $return !== 0) {
     die("Failed merging origin. Use '--force' if you like chaos.");
 }
 
-if(!in_array('--skip-style', $argv, true)) {
-    exec('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
+if(file_exists('src') && !in_array('--skip-style', $argv, true)) {
+    run('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
     exec('[[ $(git status src --porcelain) ]] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
 }
 
-/**
- * @return string
- */
-function getVersionFile()
-{
-    $dir = __DIR__;
-    while ($dir !== dirname($dir) && $dir = dirname($dir)) {
-        if (file_exists($dir.'/VERSION') || file_exists($dir.'/composer.json')) {
-            return $dir.'/VERSION';
-        }
-    }
-    die('Cannot find a VERSION or composer.json file in ancestor path');
-}
-
-$versionFile = getVersionFile();
-$version = file_get_contents($versionFile);
+$version = file_get_contents('VERSION');
 
 /**
  * @return string
@@ -87,7 +72,7 @@ function run($cmd) {
     `$cmd`;
 }
 
-file_put_contents($versionFile, $version);
+file_put_contents('VERSION', $version);
 $message = escapeshellarg("$version: " . str_replace("$oldVersion: ", '', trim(`git log -1 --pretty=%B`)));
 
 run("git commit VERSION -m $message");
