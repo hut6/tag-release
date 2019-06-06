@@ -49,8 +49,8 @@ if(!$force && $return !== 0) {
 }
 
 if(file_exists('src') && !in_array('--skip-style', $argv, true)) {
-    run('[[ $(git diff origin/master --name-only src) ]] && bin/php-cs-fixer fix -q src'); // Run fixer
-    exec('[[ $(git status src --porcelain) ]] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
+    run('[ "$(git diff origin/master --name-only src)" ] && bin/php-cs-fixer fix -q src'); // Run fixer
+    exec('[ "$(git status src --porcelain)" ] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
 }
 
 $version = file_get_contents('VERSION');
