@@ -3,18 +3,16 @@
   "description": "Release tagging...",
   "type": "library",
   "license": "proprietary",
-  "version": "1.0.8",
   "authors": [
     {
-      "name": "Ryan Castle",
-      "email": "ryan@hutsix.com.au"
+      "name": "HutSix",
+      "email": "team@hutsix.com.au"
     }
   ],
   "minimum-stability": "stable",
   "require": {
   },
   "bin": [
-    "bin/php-cs-fixer",
     "tag-release"
   ]
 }
