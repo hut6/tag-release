@@ -3,7 +3,7 @@
   "description": "Release tagging...",
   "type": "library",
   "license": "proprietary",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "authors": [
     {
       "name": "Ryan Castle",
@@ -14,7 +14,6 @@
   "require": {
   },
   "bin": [
-    "bin/php-cs-fixer",
     "tag-release"
   ]
 }

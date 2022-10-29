@@ -1,18 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-/* Check if style.css is minified */
-if(!in_array('--force-css', $argv)) {
-    $changes = `git status -s | grep 'css'`; // Look for style changes
-    if(strstr($changes, '.scss') && ! strstr($changes, 'style.css')) { // Check if sass has changed but CSS hasn't
-        die("SASS has changed, but not style.css. Did you forget to 'npm run css'? Use --force-css to ignore");
-    }
-    $cssLineCount = trim(`[ -e css/style.css ] && wc -l css/style.css | awk '{ print $1 }'`);
-    if($cssLineCount > 100) {
-        die("css/style.css has $cssLineCount lines. Did you forget to 'npm run css'? Use --force-css to ignore");
-    }
-}
-
 /** Options */
 $releases = array('fix', 'patch', 'minor', 'major');
 
@@ -48,11 +36,6 @@ if(!$force && $return !== 0) {
     die("Failed merging origin. Use '--force' if you like chaos.");
 }
 
-if(file_exists('src') && !in_array('--skip-style', $argv, true)) {
-    run('[ "$(git diff origin/master --name-only src)" ] && bin/php-cs-fixer fix -q src'); // Run fixer
-    exec('[ "$(git status src --porcelain)" ] && git commit src -m"$(git log -1 --pretty=%B) {+PSR}"'); // Commit changes
-}
-
 $version = file_get_contents('VERSION');
 
 /**
@@ -82,7 +65,7 @@ run("git tag -a $version -m 'Release $version'");
 echo "Version is $version\n";
 
 if($push) {
-    run('git push origin master --follow-tags');
+    run('git push --follow-tags');
 }
 
 /* Run post-tag-cmd scripts if present */
