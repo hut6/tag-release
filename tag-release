@@ -36,7 +36,14 @@ if(!$force && $return !== 0) {
     die("Failed merging origin. Use '--force' if you like chaos.");
 }
 
-$version = file_get_contents('VERSION');
+$versionFile = 'VERSION';
+
+if(!file_exists($versionFile)) {
+    $version = '0.0.0';
+    file_put_contents($versionFile, $version);
+} else {
+    $version = file_get_contents($versionFile);
+}
 
 /**
  * @return string
@@ -55,12 +62,11 @@ function run($cmd) {
     `$cmd`;
 }
 
-file_put_contents('VERSION', $version);
+file_put_contents($versionFile, $version);
 $message = escapeshellarg("$version: " . str_replace("$oldVersion: ", '', trim(`git log -1 --pretty=%B`)));
 
 run("git commit VERSION -m $message");
 run("git tag -a $version -m 'Release $version'");
-
 
 echo "Version is $version\n";
 

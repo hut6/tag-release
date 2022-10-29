@@ -1,9 +1,0 @@
-#!/bin/sh
-
-echo "Usage: $0 env tag"
-echo
-
-# Production doesn't do debug
-[[ "$1" = "prod" ]] && DEBUG="--no-debug"
-
-git fetch --all --tags && git checkout --force $2 && app/console cache:clear --env=${1-prod} $DEBUG && app/console assets:install && app/console assetic:dump --env=${1-prod} $DEBUG
