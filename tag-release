@@ -32,8 +32,8 @@ if($rebase) {
 } else {
     exec('git pull --ff-only', $output, $return);
 }
-if(!$force && $return !== 0) {
-    die("Failed merging origin. Use '--force' if you like chaos.");
+if($return !== 0) {
+    die("Failed merging origin. Probably requires manual fix.");
 }
 
 $versionFile = 'VERSION';
